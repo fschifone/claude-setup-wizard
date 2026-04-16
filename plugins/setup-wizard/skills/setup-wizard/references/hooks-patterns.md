@@ -26,7 +26,7 @@ When detected signals match, generate the corresponding hook entry in
       "matcher": "Write|Edit|MultiEdit",
       "hooks": [{
         "type": "command",
-        "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/auto-format.sh",
+        "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/auto-format.sh\"",
         "timeout": 15
       }]
     }]
@@ -65,7 +65,7 @@ Always recommended:
       "matcher": "Bash",
       "hooks": [{
         "type": "command",
-        "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/block-dangerous-bash.sh",
+        "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/block-dangerous-bash.sh\"",
         "timeout": 5
       }]
     }]
@@ -96,7 +96,7 @@ Always available, recommended at Standard+ depth:
       "matcher": "Bash",
       "hooks": [{
         "type": "command",
-        "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/log-bash.sh",
+        "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/log-bash.sh\"",
         "timeout": 5
       }]
     }]

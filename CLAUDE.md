@@ -58,6 +58,8 @@ skill and orchestrates everything.
 - Use `${CLAUDE_PROJECT_DIR}` for paths in hook commands (never hardcoded).
 - Keep templates neutral — no stack-specific defaults in the wizard's questions.
 - Use `{{PLACEHOLDER}}` syntax in templates. Nothing else. No Jinja, no mustache.
+- Run tests (`./scripts/validate.sh`) before committing.
+- Push code when tests pass and implementation is done.
 
 ### Claude must NEVER
 - Invent MCP server URLs or API credentials in the `.mcp.json` template.
@@ -65,6 +67,7 @@ skill and orchestrates everything.
 - Add telemetry, network calls, or auto-updates to hooks or the status line.
 - Use `rm -rf`, `sudo`, or any destructive command anywhere in this repo.
 - Remove the `_comment` keys from JSON templates — they're documentation.
+- Share personal information about the user or contributors.
 
 ### Known pitfalls
 - **`permissions.allow` patterns are prefix-matched, not glob.** `Bash(curl * | sh:*)`
@@ -76,6 +79,8 @@ skill and orchestrates everything.
   Any other non-zero = warning logged but tool proceeds.
 - **Marketplace `source` field** accepts either a relative path (`./plugins/...`)
   or a git URL. Keep it relative for this repo.
+- **`${CLAUDE_PROJECT_DIR}` must always be quoted** in hook/statusline commands
+  (`"${CLAUDE_PROJECT_DIR}/..."`). Paths with spaces break unquoted expansions.
 
 ## Secrets
 

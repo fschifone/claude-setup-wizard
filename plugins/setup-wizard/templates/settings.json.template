@@ -41,7 +41,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/block-dangerous-bash.sh",
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/block-dangerous-bash.sh\"",
             "timeout": 5
           }
         ]
@@ -53,7 +53,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/auto-format.sh",
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/auto-format.sh\"",
             "timeout": 15
           }
         ]
@@ -62,7 +62,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/statusline.sh",
+    "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/statusline.sh\"",
     "padding": 0
   },
   "env": {

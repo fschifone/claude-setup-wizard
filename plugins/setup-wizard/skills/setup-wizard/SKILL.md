@@ -396,7 +396,7 @@ Copy from this plugin's `hooks/` directory only the hooks selected:
 - `run-tests-on-stop.sh`    — Stop hook, runs test command
 - `log-bash.sh`             — PreToolUse matcher `Bash`, appends to `.claude/logs/bash.log`
 
-Wire them into `settings.json` hooks section with `${CLAUDE_PROJECT_DIR}`.
+Wire them into `settings.json` hooks section with `"${CLAUDE_PROJECT_DIR}"` (always quoted — paths may contain spaces).
 
 ### 4.8 · Status line (`.claude/statusline.sh`) — ALWAYS GENERATED
 
@@ -417,7 +417,7 @@ Then `chmod +x` and wire into settings.json:
 ```json
 "statusLine": {
   "type": "command",
-  "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/statusline.sh",
+  "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/statusline.sh\"",
   "padding": 0
 }
 ```
