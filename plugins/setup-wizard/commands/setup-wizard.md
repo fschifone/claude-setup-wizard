@@ -1,7 +1,8 @@
 ---
-description: Interactive wizard that configures the complete Claude Code environment for this project (CLAUDE.md, commands, agents, hooks, status line, MCP, output styles)
-argument-hint: [--new | --existing | --audit]
+description: "[LEGACY — use skills/setup-wizard/SKILL.md instead] Interactive wizard that configures the complete Claude Code environment"
+argument-hint: [--new | --existing | --audit | --quick | --full]
 allowed-tools: Bash(ls:*), Bash(cat:*), Bash(find:*), Bash(git:*), Bash(mkdir:*), Bash(chmod:*), Bash(test:*), Read, Write, Edit, Glob, Grep
+user-invocable: false
 ---
 
 # Claude Environment Setup Wizard
