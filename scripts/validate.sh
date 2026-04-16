@@ -40,6 +40,7 @@ for f in \
   plugins/setup-wizard/.claude-plugin/plugin.json \
   plugins/setup-wizard/skills/setup-wizard/SKILL.md \
   plugins/setup-wizard/skills/audit/SKILL.md \
+  plugins/setup-wizard/skills/fix/SKILL.md \
   plugins/setup-wizard/hooks/block-dangerous-bash.sh \
   plugins/setup-wizard/hooks/auto-format.sh \
   plugins/setup-wizard/hooks/run-tests-on-stop.sh \

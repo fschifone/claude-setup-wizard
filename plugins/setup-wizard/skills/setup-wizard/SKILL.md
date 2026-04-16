@@ -1,8 +1,8 @@
 ---
 name: setup-wizard
 description: Interactive wizard that configures the complete Claude Code environment for this project (CLAUDE.md, skills, hooks, status line, MCP, output styles)
-argument-hint: [--new | --existing | --audit | --quick | --full]
-allowed-tools: Bash(ls:*) Bash(cat:*) Bash(find:*) Bash(git:*) Bash(mkdir:*) Bash(chmod:*) Bash(test:*) Read Write Edit Glob Grep
+argument-hint: [--new | --existing | --auto | --audit | --quick | --full]
+allowed-tools: Bash(ls:*) Bash(cat:*) Bash(find:*) Bash(git:*) Bash(mkdir:*) Bash(chmod:*) Bash(test:*) Bash(head:*) Bash(wc:*) Bash(grep:*) Read Write Edit Glob Grep
 user-invocable: true
 ---
 
@@ -33,6 +33,7 @@ opinionated defaults on the user.
 Parse `$ARGUMENTS`:
 - `--new` → skip detection, go to Step 2
 - `--existing` → Step 1 detection, then Step 2
+- `--auto` → Step 1A deep introspection, then Step 1B auto-generation (0 questions)
 - `--audit` → Step 1 detection, then Step 5 (report, no writes)
 - `--quick` → Quick depth (same as choosing Quick below)
 - `--full` → Full depth (same as choosing Full below)
@@ -43,9 +44,10 @@ Parse `$ARGUMENTS`:
 > **Which mode?**
 > 1. **New project** — scaffold from scratch
 > 2. **Existing project** — analyze repo, fill gaps
-> 3. **Audit only** — report what's missing, don't write
+> 3. **Auto** — deep-scan the codebase, generate config with zero questions
+> 4. **Audit only** — report what's missing, don't write
 
-**Depth** (if not set by argument — ask AFTER mode):
+**Depth** (if not set by argument — ask AFTER mode, skip for Auto):
 
 > **How thorough?**
 > 1. **Quick** (~8 questions, ~2 min) — project identity, stack, commands, safety hook. Good enough to start.
@@ -105,6 +107,95 @@ Report findings compactly:
 > - Git: <branch + last 3 commits, or "not a git repo">
 >
 > **I'll ask only about what I couldn't infer.**
+
+---
+
+## Step 1A — Deep introspection (Auto mode only)
+
+If `--auto` was selected, go deeper than basic detection. Read actual source
+files to understand the project without asking any questions.
+
+### Read these files fully:
+- `README.md` — project purpose, setup instructions, architecture notes
+- `package.json` / `pyproject.toml` / `Cargo.toml` / `go.mod` — dependencies,
+  scripts, metadata
+- `Makefile` / `Taskfile.yml` / `justfile` — build/test/deploy targets
+- `docker-compose*.yml` / `Dockerfile` — services, ports, dependencies
+- `.editorconfig`, `.prettierrc*`, `.eslintrc*`, `pyproject.toml [tool.*]` —
+  code conventions
+- `docs/*.md` or `doc/*.md` — architecture docs (first 3 files)
+- A sample of 2–3 source files — to detect patterns (type hints, docstrings,
+  import conventions, error handling style)
+
+### Analyze git history:
+```bash
+git log --format='%an' | sort -u                    # team members
+git log --oneline -20                                # recent activity
+git log --format='%s' -20                            # commit style
+git remote -v                                        # origin
+```
+
+### Analyze directory structure:
+```bash
+find . -maxdepth 2 -type d -not -path './.git*' -not -path './node_modules*'
+```
+
+### From all this, infer:
+- Project name and purpose (from README or package.json description)
+- Stage (from git activity, branch strategy, CI presence)
+- Team size (from git authors)
+- Stack, languages, frameworks (from dependencies)
+- All operational commands (from scripts/Makefile/package.json)
+- Architecture and main modules (from directory structure)
+- Code conventions (from linter configs and source samples)
+- Commit style (from git log)
+- Secrets policy (from .gitignore and .env presence)
+- NEVER rules (from dangerous files like migrations, generated code, vendor/)
+
+### Then go to Step 1B.
+
+---
+
+## Step 1B — Auto-generate and confirm (Auto mode only)
+
+Using everything inferred in Step 1A, generate the complete file plan
+as if the user had answered every applicable question. Present it as:
+
+```
+AUTO-DETECTED CONFIGURATION
+
+Project: <name> — <purpose>
+Stack: <languages + frameworks>
+Stage: <inferred> · Team: <N authors detected>
+
+CLAUDE.md will include:
+  - Stack: <summary>
+  - Commands: <test>, <lint>, <build>, <dev>, <deploy>
+  - Rules: NEVER <list>, ALWAYS <list>
+  - Pitfalls: <any detected from code patterns>
+
+settings.json will include:
+  - Allow: <commands>
+  - Deny: rm -rf, force push, <project-specific>
+  - Hooks: block-dangerous-bash (recommended)
+  - Status line: minimal
+
+FILE PLAN:
+  CLAUDE.md                           — <line count> lines
+  CLAUDE.local.md                     — personal notes
+  .claude/settings.json               — permissions, hooks, status line
+  .claude/hooks/block-dangerous-bash.sh
+  .claude/statusline.sh               — minimal
+  .gitignore                          — protections added
+
+Everything look right? [yes / edit / cancel]
+```
+
+If "yes" → go to Step 4 (file generation).
+If "edit" → ask which part to change, make the adjustment, re-confirm.
+If "cancel" → stop.
+
+The key: **zero questions asked**. The user just confirms or edits the result.
 
 ---
 

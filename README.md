@@ -26,28 +26,52 @@ Restart Claude Code after installing.
 
 ```
 /setup-wizard              # interactive — asks mode + depth
-/setup-wizard --existing   # analyze repo, fill gaps
+/setup-wizard --auto       # zero questions — reads the codebase, generates config
+/setup-wizard --existing   # analyze repo, fill gaps with questions
 /setup-wizard --new        # scaffold from scratch
 /setup-wizard --quick      # ~8 questions, ~2 minutes
 /setup-wizard --full       # up to 30 questions, everything
 /setup-wizard --audit      # read-only gap report, no writes
 /audit                     # standalone audit skill
+/fix                       # diagnose & fix existing Claude config issues
 ```
 
 ---
 
-## Choose your depth
+## Three ways to use it
 
-Not every project needs 30 questions. Pick a depth level:
+### 1. Auto mode (0 questions) — `--auto`
+
+The wizard reads your codebase deeply — README, package.json, source files,
+git history, linter configs, directory structure — and generates the entire
+configuration without asking a single question. You just confirm the result.
+
+Best for: getting started fast on an existing project.
+
+### 2. Interactive mode (8–30 questions) — `--quick` / `--existing` / `--full`
+
+Pick a depth level:
 
 | Depth | Questions | Time | What you get |
 |-------|-----------|------|-------------|
-| **Quick** | ~8 | ~2 min | `CLAUDE.md` + `settings.json` + safety hook + minimal status line. Good enough to start. |
-| **Standard** | ~15 | ~4 min | Adds safety rules, secrets config, automation hooks, rich status line. Right for most projects. |
-| **Full** | up to 30 | ~8 min | Adds architecture docs, MCP integrations, custom skills, scoped rules, output styles. For large teams. |
+| **Quick** | ~8 | ~2 min | `CLAUDE.md` + `settings.json` + safety hook + minimal status line |
+| **Standard** | ~15 | ~4 min | Adds safety rules, secrets, automation hooks, rich status line |
+| **Full** | up to 30 | ~8 min | Adds architecture docs, MCP, skills, scoped rules, output styles |
 
-You can always re-run the wizard later at a deeper level — it detects existing
-config and only fills gaps.
+Best for: when you want control over every decision.
+
+### 3. Fix mode — `/fix`
+
+For projects that **already have Claude config** but Claude isn't performing
+well. The `/fix` skill:
+
+1. **Deep-scans** your codebase and existing Claude config
+2. **Diagnoses** mismatches (wrong commands, stale references, missing rules,
+   broken hooks, token waste)
+3. **Proposes fixes** with a clear report (CRITICAL / PROBLEMS / SUGGESTIONS)
+4. **Applies fixes** with your approval — targeted edits, not rewrites
+
+Best for: "I have CLAUDE.md but Claude still gets things wrong."
 
 ### What happens when you skip a question?
 
@@ -59,13 +83,24 @@ beats a full one with 12 half-empty sections — and saves tokens on every turn.
 
 ## How it works
 
-1. **Mode selection** — new project, existing project, or audit-only
-2. **Repo detection** — scans for package.json, pyproject.toml, Cargo.toml, go.mod, Makefile, lock files, linter configs, and existing Claude config. Skips what it can infer.
-3. **Depth selection** — Quick / Standard / Full (or `--quick` / `--full` flags)
-4. **Questions** — asked one at a time, numbered, with smart defaults for skipped questions
-5. **File plan** — shows every file it will create, waits for explicit "yes"
-6. **File generation** — writes all files; never overwrites (offers merge / backup / skip)
-7. **Post-setup** — tells you how to activate and suggests re-running at deeper level
+### Interactive mode
+1. **Mode + depth selection** — new/existing + Quick/Standard/Full
+2. **Repo detection** — scans package.json, pyproject.toml, Cargo.toml, go.mod, Makefile, lock files, linter configs, existing Claude config
+3. **Questions** — one at a time, numbered, skips what was detected
+4. **File plan** — shows every file, waits for "yes"
+5. **File generation** — writes files; never overwrites (merge / backup / skip)
+
+### Auto mode (`--auto`)
+1. **Deep introspection** — reads README, dependencies, source files, git history, linter configs, directory structure
+2. **Infers everything** — project name, stack, commands, architecture, conventions, team size, commit style
+3. **Presents result** — shows what it will generate, user confirms or edits
+4. **Writes files** — same safe generation as interactive mode
+
+### Fix mode (`/fix`)
+1. **Reads everything** — codebase AND existing Claude config
+2. **Diagnoses mismatches** — wrong commands, stale refs, missing rules, broken hooks, token waste
+3. **Reports** — CRITICAL / PROBLEMS / SUGGESTIONS with scores
+4. **Applies targeted edits** — with approval, never rewrites from scratch
 
 ---
 
@@ -193,7 +228,88 @@ Claude: ✓ CLAUDE.md — root context (compact: Stack, Commands, Rules only)
         Want more? Re-run /setup-wizard at Standard or Full depth.
 ```
 
-## Example: Full setup (~8 min)
+## Example: Auto mode (0 questions)
+
+```
+You: /setup-wizard --auto
+
+Claude: [reading README.md, package.json, src/, git log, .prettierrc...]
+
+  AUTO-DETECTED CONFIGURATION
+
+  Project: ordergate — gateway that validates orders before routing to fulfillment
+  Stack: Python 3.12 + FastAPI + PostgreSQL + Alembic
+  Stage: production (inferred from CI + tagged releases)
+  Team: 3 developers (from git log)
+  Test: pytest · Lint: ruff check --fix · Build: none · Dev: uvicorn
+  Commit style: conventional commits
+
+  CLAUDE.md will include:
+    - Stack: Python 3.12, FastAPI, PostgreSQL, Alembic, uv
+    - Commands: pytest, ruff check --fix, uvicorn, alembic upgrade head
+    - NEVER: modify migration files, drop tables, edit .env
+    - ALWAYS: type hints on public functions, run tests before commit
+
+  FILE PLAN:
+    CLAUDE.md, CLAUDE.local.md
+    .claude/settings.json — permissions + safety hook + minimal status line
+    .claude/hooks/block-dangerous-bash.sh
+    .claude/statusline.sh — minimal
+    .gitignore — protections
+
+  Everything look right? [yes / edit / cancel]
+
+You: yes
+
+Claude: ✓ CLAUDE.md — 45 lines, compact
+        ✓ CLAUDE.local.md
+        ✓ .claude/settings.json
+        ✓ .claude/hooks/block-dangerous-bash.sh
+        ✓ .claude/statusline.sh
+        ✓ .gitignore
+
+        Setup complete. Restart Claude Code to activate.
+```
+
+## Example: Fix mode (existing config)
+
+```
+You: /fix
+
+Claude: [reading codebase + existing Claude config...]
+
+  CLAUDE CONFIG DIAGNOSIS — ordergate
+
+  Score: 4/10
+
+  CRITICAL:
+    ! CLAUDE.md says "npm test" but pyproject.toml uses pytest
+    ! settings.json hooks reference .claude/hooks/format.sh — file doesn't exist
+
+  PROBLEMS:
+    ~ CLAUDE.md is 230 lines — move backend rules to .claude/rules/backend.md
+    ~ No deny list — rm -rf and force push not blocked
+    ~ .gitignore doesn't protect CLAUDE.local.md
+
+  SUGGESTIONS:
+    + Add status line for token awareness
+    + Create /deploy skill — detected fly deploy in Makefile
+
+  Fix all CRITICAL and PROBLEM items? [fix all / one-by-one / cancel]
+
+You: fix all
+
+Claude: ✓ Fixed CLAUDE.md: npm test → pytest
+        ✓ Fixed hook path: format.sh → auto-format.sh (copied from plugin)
+        ✓ Moved 80 lines to .claude/rules/backend.md
+        ✓ Added permissions.deny to settings.json
+        ✓ Added .gitignore protections
+
+        Score: 4/10 → 8/10
+        Restart Claude Code to activate.
+```
+
+## Example: Full interactive (~8 min)
 
 ```
 You: /setup-wizard --existing --full
@@ -201,7 +317,6 @@ You: /setup-wizard --existing --full
 Claude: Detected:
   - Stack: Python 3.12 + FastAPI + PostgreSQL
   - Test: pytest · Linter: ruff · Build: none
-  - Existing Claude config: none
   - Git: main (3 commits, 2 authors)
 
   Question 1/30: Project name and purpose?
@@ -212,9 +327,7 @@ Claude: FILE PLAN
   CLAUDE.md, CLAUDE.local.md, backend/CLAUDE.md
   .claude/settings.json, .gitignore
   .claude/rules/backend.md
-  .claude/skills/deploy/SKILL.md
-  .claude/skills/new-migration/SKILL.md
-  .claude/skills/test-writer/SKILL.md
+  .claude/skills/deploy/SKILL.md, new-migration/SKILL.md, test-writer/SKILL.md
   .claude/hooks/block-dangerous-bash.sh, auto-format.sh
   .mcp.json (postgres + github)
   .claude/statusline.sh (rich)
