@@ -39,8 +39,7 @@ claude-setup-wizard/                     ← marketplace root
 ├── .claude-plugin/marketplace.json      ← lists the plugin(s) below
 └── plugins/setup-wizard/                ← one plugin
     ├── .claude-plugin/plugin.json       ← plugin manifest
-    ├── skills/                          ← SKILL.md files (setup-wizard, audit)
-    ├── commands/                        ← legacy commands (kept for backward compat)
+    ├── skills/                          ← SKILL.md files (setup-wizard, audit, fix)
     ├── hooks/                           ← bash scripts invoked by settings.json
     ├── statusline/                      ← bash scripts that read stdin JSON
     └── templates/                       ← placeholders filled by the wizard

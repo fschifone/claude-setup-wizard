@@ -79,7 +79,7 @@ while IFS= read -r f; do
     echo "  ❌ missing frontmatter: $f"
     exit 1
   fi
-done < <(find plugins/setup-wizard/skills -name "SKILL.md" 2>/dev/null; find plugins/setup-wizard/commands -name "*.md" 2>/dev/null)
+done < <(find plugins/setup-wizard/skills -name "SKILL.md" 2>/dev/null)
 echo
 
 # --- smoke-test hooks ---

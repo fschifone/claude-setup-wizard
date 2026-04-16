@@ -457,8 +457,7 @@ claude-setup-wizard/
 │   └── marketplace.json             ← marketplace manifest
 ├── plugins/setup-wizard/
 │   ├── .claude-plugin/plugin.json   ← plugin manifest
-│   ├── skills/                      ← setup-wizard, audit (SKILL.md format)
-│   ├── commands/                    ← legacy commands (backward compat)
+│   ├── skills/                      ← setup-wizard, audit, fix (SKILL.md format)
 │   ├── hooks/                       ← 4 shell scripts
 │   ├── statusline/                  ← rich.sh, minimal.sh
 │   └── templates/                   ← 9 generated-file templates
