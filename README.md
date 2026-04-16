@@ -367,7 +367,7 @@ claude-setup-wizard/
 │   │   │       └── skills-catalog.md    ← pattern → skill mapping
 │   │   ├── audit/SKILL.md              ← read-only gap report
 │   │   └── fix/SKILL.md               ← diagnose & repair
-│   ├── hooks/                           ← 4 safety/automation scripts
+│   ├── templates/hooks/                 ← 4 safety/automation scripts
 │   ├── statusline/                      ← rich.sh, minimal.sh
 │   └── templates/                       ← 9 file generation templates
 ├── examples/sample-output/              ← complete example project

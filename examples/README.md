@@ -27,7 +27,7 @@ sample-output/
 
 Missing from this sample (would be copied by the wizard into `.claude/hooks/`
 and `.claude/statusline.sh`):
-- the 4 hook scripts — see `plugins/setup-wizard/hooks/` in the repo root
+- the 4 hook scripts — see `plugins/setup-wizard/templates/hooks/` in the repo root
 - the status line script — see `plugins/setup-wizard/statusline/`
 
 ## Notes on what's intentionally NOT here

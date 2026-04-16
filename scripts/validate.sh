@@ -41,10 +41,10 @@ for f in \
   plugins/setup-wizard/skills/setup-wizard/SKILL.md \
   plugins/setup-wizard/skills/audit/SKILL.md \
   plugins/setup-wizard/skills/fix/SKILL.md \
-  plugins/setup-wizard/hooks/block-dangerous-bash.sh \
-  plugins/setup-wizard/hooks/auto-format.sh \
-  plugins/setup-wizard/hooks/run-tests-on-stop.sh \
-  plugins/setup-wizard/hooks/log-bash.sh \
+  plugins/setup-wizard/templates/hooks/block-dangerous-bash.sh \
+  plugins/setup-wizard/templates/hooks/auto-format.sh \
+  plugins/setup-wizard/templates/hooks/run-tests-on-stop.sh \
+  plugins/setup-wizard/templates/hooks/log-bash.sh \
   plugins/setup-wizard/statusline/rich.sh \
   plugins/setup-wizard/statusline/minimal.sh \
   README.md LICENSE CLAUDE.md
@@ -87,13 +87,13 @@ echo "→ Hook smoke tests"
 
 # safe command → allowed
 echo '{"tool_input":{"command":"ls -la"}}' | \
-  bash plugins/setup-wizard/hooks/block-dangerous-bash.sh
+  bash plugins/setup-wizard/templates/hooks/block-dangerous-bash.sh
 echo "  ✓ block-dangerous-bash allows 'ls -la'"
 
 # dangerous command → blocked (exit 2)
 set +e
 echo '{"tool_input":{"command":"rm -rf /"}}' | \
-  bash plugins/setup-wizard/hooks/block-dangerous-bash.sh 2>/dev/null
+  bash plugins/setup-wizard/templates/hooks/block-dangerous-bash.sh 2>/dev/null
 rc=$?
 set -e
 if [[ $rc -ne 2 ]]; then
@@ -105,7 +105,7 @@ echo "  ✓ block-dangerous-bash blocks 'rm -rf /' (exit 2)"
 # log-bash writes a line
 tmpdir=$(mktemp -d)
 echo '{"tool_input":{"command":"echo hi"},"session_id":"x","cwd":"."}' | \
-  CLAUDE_PROJECT_DIR="$tmpdir" bash plugins/setup-wizard/hooks/log-bash.sh
+  CLAUDE_PROJECT_DIR="$tmpdir" bash plugins/setup-wizard/templates/hooks/log-bash.sh
 test -s "$tmpdir/.claude/logs/bash.log"
 rm -rf "$tmpdir"
 echo "  ✓ log-bash writes to log"

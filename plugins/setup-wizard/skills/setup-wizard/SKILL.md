@@ -394,7 +394,7 @@ only the rules that apply to that directory scope.
 
 ### 4.7 · Hooks (`.claude/hooks/<n>.sh`)
 
-Copy from this plugin's `hooks/` directory only the hooks selected:
+Copy from this plugin's `templates/hooks/` directory only the hooks selected:
 
 - `block-dangerous-bash.sh` — PreToolUse matcher `Bash`, exits 2 on dangerous patterns
 - `auto-format.sh`          — PostToolUse matcher `Write|Edit`, runs linter

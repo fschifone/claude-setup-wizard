@@ -1,6 +1,5 @@
 {
   "name": "setup-wizard",
-  "version": "1.2.0",
   "description": "Interactive wizard to configure the perfect Claude Code environment — CLAUDE.md hierarchy, skills, hooks, status line, MCP config, and output styles.",
   "author": {
     "name": "fschifone",

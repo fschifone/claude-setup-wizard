@@ -55,7 +55,7 @@ Before opening a PR:
 ```bash
 # Simulate a PreToolUse Bash event
 echo '{"tool_input":{"command":"YOUR TEST COMMAND"}}' | \
-  bash plugins/setup-wizard/hooks/block-dangerous-bash.sh
+  bash plugins/setup-wizard/templates/hooks/block-dangerous-bash.sh
 echo "exit: $?"   # 0 = allow, 2 = block
 ```
 

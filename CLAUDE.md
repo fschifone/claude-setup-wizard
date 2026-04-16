@@ -26,9 +26,9 @@ it with `/plugin marketplace add <this-repo>` and then get `/setup-wizard` and
 | Purpose                | Command                              |
 |------------------------|--------------------------------------|
 | Validate all files     | `./scripts/validate.sh`              |
-| Test a hook locally    | `echo '<json>' \| bash hooks/<n>.sh` |
+| Test a hook locally    | `echo '<json>' \| bash templates/hooks/<n>.sh` |
 | Test status line       | `echo '<json>' \| bash statusline/rich.sh` |
-| Lint shell scripts     | `shellcheck hooks/*.sh statusline/*.sh` |
+| Lint shell scripts     | `shellcheck templates/hooks/*.sh statusline/*.sh` |
 
 ## Architecture
 
@@ -40,7 +40,7 @@ claude-setup-wizard/                     ← marketplace root
 └── plugins/setup-wizard/                ← one plugin
     ├── .claude-plugin/plugin.json       ← plugin manifest
     ├── skills/                          ← SKILL.md files (setup-wizard, audit, fix)
-    ├── hooks/                           ← bash scripts invoked by settings.json
+    ├── templates/hooks/                 ← hook scripts copied to user projects
     ├── statusline/                      ← bash scripts that read stdin JSON
     └── templates/                       ← placeholders filled by the wizard
 ```
@@ -108,12 +108,12 @@ If you're adding a new hook that needs credentials, use env vars referenced as
 
 ## Adding a new hook
 
-1. Write the `.sh` in `plugins/setup-wizard/hooks/`, with `set -o pipefail`,
+1. Write the `.sh` in `plugins/setup-wizard/templates/hooks/`, with `set -o pipefail`,
    jq fallback, and `exit 0` at the end (unless it's a blocking hook).
 2. Add an entry to the wizard's Q25 multi-select in `skills/setup-wizard/SKILL.md`.
 3. Add the wiring stanza to `templates/settings.json.template` under the
    appropriate event (`PreToolUse`, `PostToolUse`, `Stop`, `SubagentStop`, etc.).
-4. Test: `echo '{"tool_input":{"command":"..."}}' | bash hooks/your-hook.sh`
+4. Test: `echo '{"tool_input":{"command":"..."}}' | bash templates/hooks/your-hook.sh`
 5. Document it in the README's "safety hooks" section.
 
 ## Adding a new skill
