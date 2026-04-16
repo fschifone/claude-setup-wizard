@@ -131,9 +131,20 @@ After reading everything, produce a diagnosis. Check for these problems:
 - **Redundant nested CLAUDE.md** — duplicates rules from parent
 
 ### Missing opportunities
+
+Cross-reference the project against the detection catalogs:
+- Read [references/mcp-servers.md](references/mcp-servers.md) — check if
+  detected dependencies have matching MCP servers not yet in `.mcp.json`
+- Read [references/hooks-patterns.md](references/hooks-patterns.md) — check if
+  detected formatters/testers have matching hooks not yet wired
+- Read [references/skills-catalog.md](references/skills-catalog.md) — check if
+  project patterns match skills that don't exist yet
+
+Specific checks:
 - **No skills** — project has obvious repetitive workflows
 - **No status line** — context usage invisible
 - **No MCP** — project uses databases/APIs that MCP could expose
+- **Missing hooks** — formatter detected but no auto-format hook wired
 - **Legacy format** — uses commands/*.md or agents/*.md instead of skills/
 
 ---

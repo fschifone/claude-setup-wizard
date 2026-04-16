@@ -152,6 +152,16 @@ find . -maxdepth 2 -type d -not -path './.git*' -not -path './node_modules*'
 - Secrets policy (from .gitignore and .env presence)
 - NEVER rules (from dangerous files like migrations, generated code, vendor/)
 
+### Then pattern-match against reference catalogs:
+- Read [references/mcp-servers.md](references/mcp-servers.md) — match detected
+  dependencies to MCP server configs. Generate `.mcp.json` entries for matches.
+- Read [references/hooks-patterns.md](references/hooks-patterns.md) — match
+  detected linter/formatter/test configs to hook configurations. Wire into
+  settings.json.
+- Read [references/skills-catalog.md](references/skills-catalog.md) — match
+  detected project patterns (deploy targets, migration tools, test frameworks)
+  to skill templates. Generate top 2-3 most relevant skills.
+
 ### Then go to Step 1B.
 
 ---
