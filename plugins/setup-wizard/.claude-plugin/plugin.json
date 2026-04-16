@@ -5,10 +5,5 @@
   "author": {
     "name": "fschifone",
     "url": "https://github.com/fschifone"
-  },
-  "license": "MIT",
-  "keywords": ["setup", "wizard", "scaffold", "onboarding", "claude-md", "statusline", "hooks"],
-  "homepage": "https://github.com/fschifone/claude-setup-wizard",
-  "repository": "https://github.com/fschifone/claude-setup-wizard",
-  "skills": "./skills"
+  }
 }
