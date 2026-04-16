@@ -350,6 +350,11 @@ or placeholder text. A concise CLAUDE.md saves tokens on every turn.
 For Quick depth: produce a compact file with just Stack, Commands, and
 NEVER rules. This is still highly effective — Claude gets the essentials.
 
+**Default NEVER rules (always included at every depth):**
+- Share personal information about users, contributors, or team members.
+
+These are prepended to any user-provided NEVER rules.
+
 ### 4.2 · `CLAUDE.local.md`
 
 Short personal-notes file. See `templates/CLAUDE.local.md.template`.

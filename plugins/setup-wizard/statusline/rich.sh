@@ -56,7 +56,8 @@ git_branch=""
 if [[ -n "$cwd" ]] && cd "$cwd" 2>/dev/null; then
   git_branch=$(git symbolic-ref --short HEAD 2>/dev/null || git describe --tags --exact-match 2>/dev/null)
   if [[ -n "$git_branch" ]]; then
-    if ! git diff --quiet 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; then
+    if ! git diff --quiet 2>/dev/null || ! git diff --cached --quiet 2>/dev/null \
+       || [[ -n "$(git ls-files --others --exclude-standard 2>/dev/null)" ]]; then
       git_branch="${git_branch}*"  # dirty marker
     fi
   fi

@@ -8,6 +8,11 @@ set -o pipefail
 # The wizard writes the test command to ~/.claude/.test_cmd or uses this env var
 TEST_CMD="${CLAUDE_TEST_CMD:-}"
 
+# Always run from project root so relative paths (./scripts/...) resolve
+if [[ -n "${CLAUDE_PROJECT_DIR:-}" ]]; then
+  cd "$CLAUDE_PROJECT_DIR" || exit 0
+fi
+
 # Fallback: try to auto-detect
 if [[ -z "$TEST_CMD" ]]; then
   if   [[ -f pyproject.toml ]] && command -v pytest >/dev/null 2>&1; then TEST_CMD="pytest -q"
