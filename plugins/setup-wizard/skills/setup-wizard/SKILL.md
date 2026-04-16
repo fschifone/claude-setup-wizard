@@ -220,7 +220,8 @@ generated files.
 
 ### QUICK depth — core setup (~8 questions)
 
-These produce a functional `CLAUDE.md` + `settings.json` + safety hook.
+These produce a functional `CLAUDE.md` + `settings.json` + safety hook +
+**minimal status line** (auto-included — token awareness is always enabled).
 
 1. **Project name and one-sentence purpose.**
 2. **Stage:** prototype / staging / production / mixed?
@@ -325,8 +326,8 @@ Configuration:
 [Integrations:]
   [.mcp.json]                         — only if MCP answered
 
-[Display:]
-  [.claude/statusline.sh]             — only if status line enabled
+Display:
+  .claude/statusline.sh               — always included (minimal at Quick, configurable at Standard+)
 
 Proceed? [yes / edit / cancel]
 ```
@@ -397,13 +398,29 @@ Copy from this plugin's `hooks/` directory only the hooks selected:
 
 Wire them into `settings.json` hooks section with `${CLAUDE_PROJECT_DIR}`.
 
-### 4.8 · Status line (`.claude/statusline.sh`)
+### 4.8 · Status line (`.claude/statusline.sh`) — ALWAYS GENERATED
+
+**This is always included at every depth level.** Token awareness is critical
+for effective Claude usage — without it, neither Claude nor the user can see
+context filling up until it's too late.
+
+- **Quick depth** → Minimal (auto-enabled, no question asked)
+- **Standard depth** → user chooses Rich / Minimal / None (default: Rich)
+- **Full depth** → user chooses Rich / Minimal / None (default: Rich)
+- **Auto mode** → Minimal
 
 If Rich → copy `statusline/rich.sh`
 If Minimal → copy `statusline/minimal.sh`
-Then `chmod +x` and wire into settings.json.
+If None (only available at Standard+) → skip
 
-At Quick depth, Minimal is auto-enabled (token awareness is too useful to skip).
+Then `chmod +x` and wire into settings.json:
+```json
+"statusLine": {
+  "type": "command",
+  "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/statusline.sh",
+  "padding": 0
+}
+```
 
 ### 4.9 · MCP (`.mcp.json`)
 
