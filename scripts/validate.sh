@@ -113,10 +113,11 @@ echo
 
 # --- smoke-test status line ---
 echo "→ Status line smoke tests"
-sample='{"model":{"display_name":"Sonnet 4.6"},"workspace":{"current_dir":"/tmp/x","project_dir":"/tmp/x"},"current_usage":{"used_percentage":42,"input_tokens":50000,"cache_read_input_tokens":20000,"cache_creation_input_tokens":10000}}'
+sample='{"model":{"display_name":"Sonnet 4.6"},"workspace":{"current_dir":"/tmp/x","project_dir":"/tmp/x"},"context_window":{"used_percentage":42,"current_usage":{"input_tokens":50000,"cache_read_input_tokens":20000,"cache_creation_input_tokens":10000}}}'
 
 for sl in rich minimal; do
-  out=$(echo "$sample" | bash "plugins/setup-wizard/statusline/${sl}.sh")
+  raw=$(echo "$sample" | bash "plugins/setup-wizard/statusline/${sl}.sh")
+  out=$(printf '%s' "$raw" | sed 's/\x1b\[[0-9;]*m//g')
   if echo "$out" | grep -q "Sonnet 4.6" && echo "$out" | grep -q "42%"; then
     echo "  ✓ ${sl}.sh produces model + percentage"
   else
