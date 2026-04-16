@@ -369,6 +369,62 @@ All hooks: `set -o pipefail`, `jq` fallbacks, plain readable bash.
 
 ---
 
+## Token cost vs. benefit
+
+### Running the wizard (one-time cost)
+
+The wizard prompt is loaded once when you invoke it, then unloaded.
+
+| Mode | Prompt size | Session tokens | Duration |
+|------|-------------|----------------|----------|
+| `--auto` | ~4,300 tokens | ~8k–15k total (reads codebase + generates files) | ~1 min |
+| `--quick` | ~4,300 tokens | ~10k–20k total (8 questions + file generation) | ~2 min |
+| `--existing` | ~4,300 tokens | ~15k–30k total (15 questions + file generation) | ~4 min |
+| `--full` | ~4,300 tokens | ~25k–50k total (30 questions + file generation) | ~8 min |
+| `/fix` | ~2,200 tokens | ~10k–25k total (reads codebase + diagnosis + edits) | ~2 min |
+| `/audit` | ~670 tokens | ~3k–5k total (read-only scan) | ~30 sec |
+
+For context: a typical coding session uses 50k–200k tokens. Running the wizard
+once is equivalent to 2–5 back-and-forth exchanges with Claude.
+
+### Ongoing cost (every turn, every session)
+
+The files the wizard generates have a per-turn token cost because `CLAUDE.md`
+is loaded on every exchange:
+
+| Depth used | CLAUDE.md size | Per-turn cost | % of 200k context |
+|------------|----------------|---------------|-------------------|
+| Quick | ~40–60 lines | ~500–700 tokens | 0.3% |
+| Standard | ~60–100 lines | ~700–1,000 tokens | 0.5% |
+| Full | ~80–120 lines | ~900–1,200 tokens | 0.6% |
+
+Other generated files (`settings.json`, hooks, status line) are **not** loaded
+into context — they're executed by Claude Code's runtime, costing zero tokens.
+
+### The payoff
+
+That 500–1,200 tokens per turn buys you:
+
+| What you get | Token impact | Without it |
+|-------------|-------------|------------|
+| Correct commands first try | **Saves ~2k–10k tokens** per task — no "oops, wrong test runner" → retry cycles | Claude guesses `npm test` when you use `pytest`, wastes a full round-trip |
+| Safety deny list | **Saves your project** — blocks `rm -rf /` before it runs | One hallucination away from disaster |
+| NEVER rules | **Saves ~1k–5k tokens** — Claude doesn't attempt forbidden actions that get rejected | Claude edits migration files, you reject, it retries, you explain why |
+| Status line | **Saves entire sessions** — you see context filling up, can compact or start fresh | Hit the wall at 95% context, responses degrade, you don't know why |
+| Scoped rules (`.claude/rules/`) | **Saves ~200–800 tokens/turn** vs. putting everything in root CLAUDE.md | Rules for backend/ load even when you're working on frontend/ |
+| Hooks (block, format, test) | **Zero token cost** — hooks run as bash, not in context | Without auto-format: Claude writes code, you format, waste a turn |
+
+### The math
+
+A typical 100-turn coding session:
+- **Without setup:** ~0 tokens on CLAUDE.md, but ~5k–20k tokens wasted on wrong commands, retries, and rejected actions = net cost higher
+- **With Quick setup:** ~700 tokens/turn x 100 = 70k tokens on CLAUDE.md, but near-zero waste = net savings of 30k–100k tokens over the session
+
+**The wizard pays for itself within the first 5–10 exchanges.** After that,
+every turn is more efficient than it would be without configuration.
+
+---
+
 ## Why Claude needs this
 
 | What | Without it |
