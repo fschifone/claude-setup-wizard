@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(pytest:*)",
+      "Bash(ruff:*)",
+      "Bash(uv run:*)",
+      "Bash(alembic:*)",
+      "Bash(swiftformat:*)",
+      "Bash(xcodebuild:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(rm -fr:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(sudo rm:*)",
+      "Bash(chmod -R 777:*)",
+      "Bash(mkfs:*)",
+      "Bash(dd if=:*)",
+      "Bash(alembic downgrade:*)"
+    ],
+    "_comment_deny": "Curl-pipe-shell patterns are blocked by hooks/block-dangerous-bash.sh because they require regex matching that Bash permissions do not support.",
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(fly deploy:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/block-dangerous-bash.sh",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/log-bash.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/auto-format.sh",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/statusline.sh",
+    "padding": 0
+  },
+  "env": {
+    "CLAUDE_TEST_CMD": "pytest -q"
+  }
+}

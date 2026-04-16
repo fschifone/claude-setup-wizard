@@ -1,0 +1,15 @@
+{
+  "name": "setup-wizard",
+  "version": "1.1.0",
+  "description": "Interactive wizard to configure the perfect Claude Code environment — CLAUDE.md hierarchy, skills, hooks, status line, MCP config, and output styles.",
+  "author": {
+    "name": "fschifone",
+    "url": "https://github.com/fschifone"
+  },
+  "license": "MIT",
+  "keywords": ["setup", "wizard", "scaffold", "onboarding", "claude-md", "statusline", "hooks"],
+  "homepage": "https://github.com/fschifone/claude-setup-wizard",
+  "repository": "https://github.com/fschifone/claude-setup-wizard",
+  "skills": "./skills",
+  "hooks": "./hooks"
+}

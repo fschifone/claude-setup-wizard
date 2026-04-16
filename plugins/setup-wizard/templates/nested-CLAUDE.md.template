@@ -1,0 +1,18 @@
+# {{AREA_NAME}}
+
+> Extends the root `CLAUDE.md`. Do not duplicate rules already defined there.
+
+## Purpose
+{{AREA_PURPOSE}}
+
+## Local structure
+{{LOCAL_STRUCTURE}}
+
+## Local commands
+{{LOCAL_COMMANDS}}
+
+## Local conventions
+{{LOCAL_CONVENTIONS}}
+
+## Gotchas specific to this area
+{{LOCAL_PITFALLS}}

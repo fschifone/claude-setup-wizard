@@ -1,0 +1,28 @@
+---
+name: {{SKILL_NAME}}
+description: {{SKILL_DESCRIPTION}}
+allowed-tools: {{ALLOWED_TOOLS}}
+---
+
+# {{SKILL_TITLE}}
+
+{{SKILL_PURPOSE}}
+
+## When to use
+{{WHEN_TO_USE}}
+
+## Steps
+
+1. {{STEP_1}}
+2. {{STEP_2}}
+3. {{STEP_3}}
+
+## Inputs
+Use `$ARGUMENTS` to receive whatever the user typed after the command name.
+
+Example: `/{{SKILL_NAME}} {{EXAMPLE_ARGS}}`
+
+## Guardrails
+- {{GUARDRAIL_1}}
+- Never modify files outside the scope of this skill.
+- If preconditions are not met, explain what's missing and stop.

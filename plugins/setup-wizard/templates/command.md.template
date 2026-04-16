@@ -1,0 +1,31 @@
+---
+description: {{COMMAND_DESCRIPTION}}
+argument-hint: {{ARGUMENT_HINT}}
+allowed-tools: {{ALLOWED_TOOLS}}
+---
+
+# {{COMMAND_TITLE}}
+
+{{COMMAND_PURPOSE}}
+
+## When to use
+{{WHEN_TO_USE}}
+
+## Steps
+
+1. {{STEP_1}}
+2. {{STEP_2}}
+3. {{STEP_3}}
+
+## Inputs
+Use `$ARGUMENTS` to receive whatever the user typed after the command name.
+
+Example invocation: `/{{COMMAND_NAME}} {{EXAMPLE_ARGS}}`
+
+## Output
+{{EXPECTED_OUTPUT}}
+
+## Guardrails
+- {{GUARDRAIL_1}}
+- Never modify files outside the scope of this command.
+- If preconditions are not met, explain what's missing and stop.

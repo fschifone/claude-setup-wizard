@@ -1,0 +1,21 @@
+# Local notes — NOT COMMITTED
+
+This file is gitignored. Use it for:
+- Current focus / WIP context
+- Machine-specific paths or secrets
+- Personal preferences that differ from the team's CLAUDE.md
+- Temporary workarounds
+
+Claude reads this file alongside CLAUDE.md, but it never leaves your machine.
+
+## Current focus
+
+_<what you're actively working on — helps Claude prioritize>_
+
+## Local quirks
+
+_<paths, tool versions, or machine-specific notes>_
+
+## Scratch
+
+_<anything else>_

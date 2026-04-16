@@ -1,0 +1,20 @@
+---
+name: {{STYLE_NAME}}
+description: {{STYLE_DESCRIPTION}}
+---
+
+# {{STYLE_NAME}} output style
+
+{{STYLE_INSTRUCTIONS}}
+
+## Tone
+{{TONE_DESCRIPTION}}
+
+## Verbosity
+{{VERBOSITY_RULES}}
+
+## Structure
+{{STRUCTURE_RULES}}
+
+## Code presentation
+{{CODE_RULES}}

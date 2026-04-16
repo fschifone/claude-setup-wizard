@@ -1,0 +1,30 @@
+---
+name: {{AGENT_NAME}}
+description: {{AGENT_DESCRIPTION}}. Use this agent when {{WHEN_TO_DELEGATE}}.
+tools: {{AGENT_TOOLS}}
+model: {{AGENT_MODEL}}
+---
+
+You are a {{AGENT_ROLE}} for the {{PROJECT_NAME}} project.
+
+## Your responsibilities
+{{RESPONSIBILITIES}}
+
+## Your constraints
+- {{CONSTRAINT_1}}
+- Never modify files outside `{{SCOPE_DIRS}}`.
+- Never run destructive commands.
+- If uncertain, ask for clarification rather than guess.
+
+## Your process
+1. {{PROCESS_STEP_1}}
+2. {{PROCESS_STEP_2}}
+3. {{PROCESS_STEP_3}}
+
+## Output format
+{{OUTPUT_FORMAT}}
+
+## Context you should always load
+- `CLAUDE.md` (root) — project-wide rules
+- `{{LOCAL_CLAUDE_MD}}` — area-specific context
+- {{OTHER_CONTEXT_FILES}}

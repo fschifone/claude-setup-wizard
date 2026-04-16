@@ -1,0 +1,24 @@
+{
+  "name": "claude-setup-wizard",
+  "owner": {
+    "name": "fschifone"
+  },
+  "metadata": {
+    "description": "A single-plugin marketplace providing an interactive wizard to scaffold the complete Claude Code environment for any project.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "setup-wizard",
+      "source": "./plugins/setup-wizard",
+      "description": "Interactive wizard to configure the perfect Claude Code environment — CLAUDE.md hierarchy, slash commands, hooks, status line, MCP config, and output styles.",
+      "version": "1.1.0",
+      "author": {
+        "name": "fschifone"
+      },
+      "license": "MIT",
+      "keywords": ["setup", "wizard", "scaffold", "onboarding", "claude-md", "statusline", "hooks"],
+      "category": "developer-tools"
+    }
+  ]
+}
