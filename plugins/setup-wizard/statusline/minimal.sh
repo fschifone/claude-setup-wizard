@@ -12,7 +12,7 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 model=$(printf '%s' "$input" | jq -r '.model.display_name // "Claude"')
-used_pct=$(printf '%s' "$input" | jq -r '.current_usage.used_percentage // empty')
+used_pct=$(printf '%s' "$input" | jq -r '.context_window.used_percentage // empty')
 
 RESET='\033[0m'; BOLD='\033[1m'; CYAN='\033[36m'
 GREEN='\033[32m'; YELLOW='\033[33m'; RED='\033[31m'
