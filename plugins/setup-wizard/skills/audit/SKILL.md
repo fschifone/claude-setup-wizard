@@ -31,6 +31,14 @@ Inspect the filesystem and report the status of each item:
 - [ ] `.claude/hooks/*.sh` — executable hook scripts
 - [ ] `.claude/statusline.sh` — executable status line script
 
+### Specialized agent team (informational — not scored)
+- [ ] `.claude/agents/*.md` — role-specialized subagents
+- For each agent found, report: `name`, `model`, and whether `tools` is
+  **restricted** (read-only review/audit roles should NOT have `Write`/`Edit`).
+- A description without an explicit trigger phrase (e.g. no "Use when…" or
+  "MUST BE USED…") is flagged ⚠ — Claude relies on the description to
+  auto-delegate, so vague descriptions mean the agent rarely fires.
+
 ### Safety
 - [ ] `.gitignore` protects `CLAUDE.local.md`
 - [ ] `.gitignore` protects `.env*`
@@ -68,9 +76,14 @@ Token efficiency:
   ⚠ CLAUDE.md is 210 lines — consider moving scoped rules to .claude/rules/
   ✓ Scoped rules in .claude/rules/ — good separation
 
+Agent team (informational):
+  ✓ .claude/agents/code-reviewer-critical.md — opus, read-only (no Edit/Write)
+  ⚠ .claude/agents/my-helper.md — description has no trigger phrase ("Use when…")
+
 Score: <X>/10
 
 Next: /setup-wizard --existing
+      /setup-wizard agents     — add or regenerate a specialized agent team
 ```
 
 Compute score as: (present_count / total_checks) * 10, rounded.

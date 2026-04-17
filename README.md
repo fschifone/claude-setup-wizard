@@ -90,6 +90,34 @@ For projects that already have Claude config but Claude isn't performing well.
 
 Scans everything, scores your config 0–10, suggests next steps. Writes nothing.
 
+### `/setup-wizard agents` — Specialized agent team
+
+After the environment is set up, add a team of role-specialized subagents
+tuned to your detected stack. Runs standalone — doesn't re-ask the full
+questionnaire.
+
+```bash
+/setup-wizard agents
+```
+
+Offers (stack-gated where it makes sense):
+
+- `frontend-specialist` — UI, components, client state (shown for React/Vue/Svelte/Next/Angular/SolidJS/SwiftUI)
+- `backend-specialist` — endpoints, server logic, integrations (shown for Express/Fastify/Nest/FastAPI/Django/Rails/Go/Spring/Phoenix)
+- `code-reviewer-critical` — strict read-only reviewer; opus by default
+- `tester` — writes and fixes tests; wired to your detected test command
+- `debugger` — root-causes errors before attempting a fix
+- `db-migrations` — forward-only schema changes (shown for Prisma/Drizzle/Alembic/SQLAlchemy/ActiveRecord/Ecto)
+- `security-auditor` — read-only security findings; opus by default
+
+Each generated agent lives at `.claude/agents/<role>.md` with the official
+frontmatter (`name`, `description`, `tools`, `model`). Tool restrictions are
+applied per role — read-only reviewers can't `Edit` or `Write`. Claude Code
+auto-delegates to them based on the `description` field, so descriptions
+include explicit trigger phrases ("Use PROACTIVELY when…", "MUST BE USED for…").
+
+Re-runnable at any time to add or regenerate agents.
+
 ---
 
 ## The questions

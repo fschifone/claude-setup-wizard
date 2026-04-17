@@ -4,6 +4,27 @@ All notable changes to this plugin are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versioning follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- `/setup-wizard agents` — new standalone sub-command that generates a
+  specialized multi-agent team under `.claude/agents/`, tuned to the stack
+  detected by Step 1. Roles offered (stack-gated where applicable):
+  `frontend-specialist`, `backend-specialist`, `code-reviewer-critical`
+  (opus, read-only), `tester`, `debugger`, `db-migrations`, `security-auditor`
+  (opus, read-only). Tool restrictions are applied per role so read-only
+  reviewers cannot `Edit` or `Write`. Descriptions include explicit
+  auto-delegation triggers ("Use PROACTIVELY…", "MUST BE USED…") per the
+  official Claude Code subagent spec.
+- Seven agent templates under `plugins/setup-wizard/templates/agents/` that
+  the skill renders with detected facts (`{{FRAMEWORK}}`, `{{TEST_CMD}}`,
+  `{{SCOPE_DIRS}}`, etc.).
+- `/audit` reports specialized agents as an informational finding (not
+  scored as a gap).
+- `/fix` diagnoses agent files missing `tools:`/`model:`, vague descriptions
+  without trigger phrases, and read-only roles that accidentally grant
+  `Write`/`Edit`.
+
 ## [1.0.0] — 2026-04-16
 
 ### Added

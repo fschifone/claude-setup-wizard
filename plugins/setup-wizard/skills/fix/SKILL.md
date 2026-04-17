@@ -145,7 +145,25 @@ Specific checks:
 - **No status line** — context usage invisible
 - **No MCP** — project uses databases/APIs that MCP could expose
 - **Missing hooks** — formatter detected but no auto-format hook wired
-- **Legacy format** — uses commands/*.md or agents/*.md instead of skills/
+- **Legacy format** — uses commands/*.md instead of skills/
+- **No agent team** — project is large or multi-stack but has no `.claude/agents/`
+  directory. Suggest `/setup-wizard agents`.
+
+### Agent-file issues (`.claude/agents/*.md`)
+- **Missing `tools:`** — agent inherits everything; read-only roles (reviewer,
+  auditor) can now edit code. Propose adding a restricted `tools` list.
+- **Missing `model:`** — agent runs on parent's model; cost/quality unpredictable.
+  Propose adding an explicit `model` (opus for critical review/security, sonnet
+  for general work, haiku for narrow fast tasks).
+- **Vague description** — no explicit trigger phrase ("Use when…", "Use
+  PROACTIVELY…", "MUST BE USED for…"). Claude's auto-delegation is driven by
+  the description field — without triggers, the agent rarely fires. Propose a
+  rewrite that includes concrete triggers.
+- **Review/audit role with `Write` or `Edit` in `tools`** — contradicts the
+  role's purpose. Propose tightening tools to `Read, Grep, Glob, Bash(git diff:*)`.
+- **Legacy location** — `.claude/commands/*.md` or `agents/*.md` outside
+  `.claude/agents/` (pre-subagent format). Propose migrating to
+  `.claude/agents/<role>.md` against `templates/agents/<role>.md.template`.
 
 ---
 
@@ -218,6 +236,14 @@ trim root CLAUDE.md, add pointer to rules directory.
 **For missing .gitignore entries:** Append protections.
 
 **For legacy format:** Offer to migrate commands/*.md → skills/*/SKILL.md.
+
+**For agent-file issues:** Edit the specific frontmatter field in place (add
+`tools:`, add `model:`, rewrite `description:` to include trigger phrases).
+Never rewrite the body from scratch — the user may have customized it. For
+legacy `.claude/commands/*.md` that look like agent prompts, offer to move
+them into `.claude/agents/<role>.md` and wrap with the frontmatter from
+`templates/agent.md.template`. If the user wants a fresh agent team instead,
+point them at `/setup-wizard agents`.
 
 ---
 

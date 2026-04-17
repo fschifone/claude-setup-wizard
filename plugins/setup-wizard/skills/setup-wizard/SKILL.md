@@ -1,7 +1,7 @@
 ---
 name: setup-wizard
-description: Interactive wizard that configures the complete Claude Code environment for this project (CLAUDE.md, skills, hooks, status line, MCP, output styles)
-argument-hint: [--new | --existing | --auto | --audit | --quick | --full]
+description: Interactive wizard that configures the complete Claude Code environment for this project (CLAUDE.md, skills, hooks, status line, MCP, output styles, specialized agents)
+argument-hint: [--new | --existing | --auto | --audit | --quick | --full | agents]
 allowed-tools: Bash(ls:*) Bash(cat:*) Bash(find:*) Bash(git:*) Bash(mkdir:*) Bash(chmod:*) Bash(test:*) Bash(head:*) Bash(wc:*) Bash(grep:*) Read Write Edit Glob Grep
 user-invocable: true
 ---
@@ -37,6 +37,7 @@ Parse `$ARGUMENTS`:
 - `--audit` → Step 1 detection, then Step 5 (report, no writes)
 - `--quick` → Quick depth (same as choosing Quick below)
 - `--full` → Full depth (same as choosing Full below)
+- `agents` → run Step 1 (light detection only), then jump straight to **Step 4.5 — Agent team phase**. Skip Steps 2, 3, 4, 5. This is the invocation used by `/setup-wizard agents`. It lets the user add or regenerate a specialized agent team at any time without re-answering every wizard question. See Step 4.5 for the flow. **`agents` takes precedence** over other flags: `/setup-wizard --full agents` and `/setup-wizard --existing agents` both behave the same as `/setup-wizard agents` (the standalone agent-team phase). If the user wanted the full wizard flow *and* the agent team, they run `/setup-wizard --full` first, then `/setup-wizard agents` — they are two separate invocations by design, because the agent phase is re-runnable and idempotent.
 - empty → ask mode first, then depth
 
 **Mode** (if not set by argument):
@@ -295,6 +296,27 @@ Includes all Standard questions, plus:
 28. **Commit message style:** conventional commits / free-form / other?
 29. **Documentation style:** docstrings required? format?
 30. **Scoped rules** — are any NEVER/ALWAYS rules specific to certain directories?
+31. **Specialized agent team?** Create role-specialized subagents (frontend, backend,
+    critical code reviewer, tester, debugger, db-migrations, security-auditor) that
+    Claude auto-delegates to based on task description. (y/N)
+
+    If the user says no → skip Q32 and Q33.
+    If yes → continue to Step 4.5 *after* Step 4 normally writes the rest, OR if
+    the wizard was invoked as `/setup-wizard agents` skip directly to Step 4.5.
+
+32. **Which agents?** (multi-select, stack-gated — only show roles whose stack
+    signals were detected in Step 1):
+    - `frontend-specialist` — shown if UI deps detected (React/Vue/Svelte/Next/Angular/SolidJS/SwiftUI)
+    - `backend-specialist` — shown if server deps detected (Express/Fastify/Nest/FastAPI/Django/Rails/Go net/http/Spring/Phoenix)
+    - `code-reviewer-critical` — always offered (read-only)
+    - `tester` — always offered, pre-wired to the detected test command
+    - `db-migrations` — shown if Prisma/Drizzle/SQLAlchemy/Alembic/ActiveRecord/Ecto detected
+    - `security-auditor` — always offered, opt-in (read-only)
+    - `debugger` — always offered
+
+33. **Use recommended models per agent?** (Y/n)
+    Defaults: `code-reviewer-critical` → opus, `security-auditor` → opus,
+    all others → sonnet. On "no", ask per-agent (`sonnet` / `opus` / `haiku`).
 
 ---
 
@@ -320,6 +342,7 @@ Configuration:
 
 [Automation:]
   [.claude/skills/<n>/SKILL.md]       — only if Q25/Q26 answered
+  [.claude/agents/<role>.md]          — only if Q31/Q32 answered
   [.claude/hooks/<n>.sh]              — per hook selection
   [.claude/output-styles/<n>.md]      — only if Custom style
 
@@ -447,6 +470,130 @@ CLAUDE.local.md
 .env
 .env.local
 ```
+
+---
+
+## Step 4.5 — Agent team phase
+
+Run this phase if:
+- the wizard was invoked as **`/setup-wizard agents`** (see Step 0), OR
+- Full depth was chosen and Q31 was answered "yes".
+
+Skipped entirely otherwise. At the end of the full-flow wizard (after 4.11),
+print this one-liner if the phase was skipped:
+
+> Tip — add a specialized agent team later with `/setup-wizard agents`.
+
+### 4.5.1 · Load detection facts
+
+If `/setup-wizard agents` was the entry point, Steps 2–4 didn't run. In that
+case, run **Step 1** (light detection) now to populate the facts the templates
+need. If the wizard is coming from the full flow, the facts from Step 1 + Step 2
+are already available — reuse them, don't re-detect.
+
+Facts required per role:
+- `{{PROJECT_NAME}}`, `{{FRAMEWORK}}`, `{{PACKAGE_MANAGER}}`
+- `{{TEST_CMD}}`, `{{LINT_CMD}}`, `{{BUILD_CMD}}`
+- `{{SCOPE_DIRS}}` — inferred per role from repo layout. Write it as a human-readable phrase, not a path (it appears inside prose like "Only modify files under `{{SCOPE_DIRS}}`"):
+  - frontend → first match among `src/`, `app/`, `web/`, `client/`, `frontend/`, `ui/`, `components/`
+  - backend  → first match among `server/`, `api/`, `backend/`, `app/` (excluding UI files), `src/` (if monolith)
+  - db-migrations → first match among `migrations/`, `db/migrate/`, `alembic/`, `prisma/migrations/`, `drizzle/`, `priv/repo/migrations/`
+  - reviewer/auditor/debugger/tester → write the literal string `the whole repository` (NOT `.`) so the prose reads naturally. These roles don't need a scope restriction; the text exists only for consistency across templates.
+  - If no match is found for a role that needs one (e.g. frontend role selected but no recognizable UI directory) → ask a one-line question: "Which directory does the frontend live in?"
+- `{{MIGRATION_TOOL}}` — Prisma / Drizzle / Alembic / ActiveRecord / Ecto / SQLAlchemy / Flyway / Liquibase (only for `db-migrations`)
+- `{{LOCAL_CLAUDE_MD}}` — if a nested CLAUDE.md exists for the relevant area, its path; else empty (drop the line)
+
+If a fact can't be inferred, **ask a one-line question**. Never write `{{PLACEHOLDER}}` to disk unfilled.
+
+### 4.5.2 · Role selection
+
+If coming from the full flow, the selection is Q32's answer.
+
+If coming from `/setup-wizard agents`, ask now — stack-gated as described in
+Q32 above. Include, in the prompt, a short "why" for each role so a first-time
+user knows what they're picking:
+
+```
+Which specialists do you want? (multi-select, space to toggle, enter to confirm)
+  [ ] frontend-specialist     — owns UI components and client code
+  [ ] backend-specialist      — owns API endpoints and server logic
+  [ ] code-reviewer-critical  — read-only; strict pre-merge review
+  [ ] tester                  — writes and fixes tests
+  [ ] debugger                — root-causes errors and failing behavior
+  [ ] db-migrations           — forward-only schema changes
+  [ ] security-auditor        — read-only; security findings only
+
+Only roles with detected stack signals are pre-checked.
+```
+
+Then ask Q33 (model choice) unless coming from the full flow.
+
+### 4.5.3 · Generation
+
+For each selected role:
+
+1. Read `templates/agents/<role>.md.template` from this plugin.
+2. Substitute every `{{PLACEHOLDER}}` from the facts in 4.5.1.
+3. If a placeholder has no value (e.g. `{{LOCAL_CLAUDE_MD}}` absent), **remove
+   every line** that contains it — don't write unfilled placeholders. Apply this
+   globally, not per-placeholder: after substitution, scan the file line-by-line
+   and drop any line still matching `{{[A-Z_]+}}`. **Exception**: never apply
+   this to the `description:` or `name:` frontmatter fields — those MUST have
+   concrete values. If a placeholder in those two lines cannot be filled, ask
+   the user; do not write the agent file.
+4. Override the `model:` field with the user's Q33 choice for that role.
+5. Write to `.claude/agents/<role>.md`.
+6. If the file already exists, apply the standard **merge / backup / skip**
+   prompt (same rule used for CLAUDE.md and settings.json — per Prime directive #5).
+7. Print `✓ .claude/agents/<role>.md — <role description short>`.
+
+After all files are written, run a final validation:
+```bash
+grep -r '{{' .claude/agents/ 2>/dev/null && echo "ERROR: unfilled placeholders" || echo "✓ no unfilled placeholders"
+```
+If any placeholder remains, report it and stop.
+
+### 4.5.4 · Delegation hints in CLAUDE.md
+
+Append (never overwrite) a short **"Agent team — delegation hints"** block to
+the root `CLAUDE.md`. **Build the list dynamically** — include one line per
+agent you actually generated, skip the rest. Substitute any remaining
+placeholders against the same facts from 4.5.1. If `{{TEST_CMD}}` or
+`{{MIGRATION_TOOL}}` are absent for included lines, drop the parenthetical
+rather than writing an unfilled placeholder.
+
+Template fragment for each generated role (assemble only the selected ones):
+
+```markdown
+## Agent team
+
+Claude delegates to these subagents automatically based on task description.
+- `frontend-specialist` — UI, components, styling, client state
+- `backend-specialist`  — endpoints, server logic, integrations
+- `code-reviewer-critical` — read-only, strict pre-merge review (opus)
+- `tester` — writes and fixes tests; wired to `{{TEST_CMD}}`
+- `debugger` — root-causes errors before fixing
+- `db-migrations` — forward-only schema changes ({{MIGRATION_TOOL}})
+- `security-auditor` — read-only security findings (opus)
+```
+
+**Idempotence**: if `## Agent team` already exists in `CLAUDE.md` (from a prior
+run), replace just that section's bullets — don't append a second `## Agent
+team` heading. Do not touch any other part of `CLAUDE.md`.
+
+This block is for humans reading `CLAUDE.md`. Claude's actual delegation comes
+from the agents' own `description` fields, not from this list.
+
+### 4.5.5 · Done
+
+Print:
+
+> Agent team ready. Restart Claude Code, then run `/agents` to see them under
+> Library → Project. Try: "review the diff on this branch" → the critical
+> reviewer should pick it up automatically.
+
+If the wizard was invoked as `/setup-wizard agents`, stop here (don't run Step 6).
+Otherwise, continue to Step 6.
 
 ---
 
