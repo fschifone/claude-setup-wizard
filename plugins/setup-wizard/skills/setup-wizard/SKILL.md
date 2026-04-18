@@ -30,15 +30,27 @@ opinionated defaults on the user.
 
 ## Step 0 — Mode and depth selection
 
-Parse `$ARGUMENTS`:
-- `--new` → skip detection, go to Step 2
-- `--existing` → Step 1 detection, then Step 2
-- `--auto` → Step 1A deep introspection, then Step 1B auto-generation (0 questions)
-- `--audit` → Step 1 detection, then Step 5 (report, no writes)
-- `--quick` → Quick depth (same as choosing Quick below)
-- `--full` → Full depth (same as choosing Full below)
-- `agents` → run Step 1 (light detection only), then jump straight to **Step 4.5 — Agent team phase**. Skip Steps 2, 3, 4, 5. This is the invocation used by `/setup-wizard agents`. It lets the user add or regenerate a specialized agent team at any time without re-answering every wizard question. See Step 4.5 for the flow. **`agents` takes precedence** over other flags: `/setup-wizard --full agents` and `/setup-wizard --existing agents` both behave the same as `/setup-wizard agents` (the standalone agent-team phase). If the user wanted the full wizard flow *and* the agent team, they run `/setup-wizard --full` first, then `/setup-wizard agents` — they are two separate invocations by design, because the agent phase is re-runnable and idempotent.
-- empty → ask mode first, then depth
+**Argument dispatch.** Normalize `$ARGUMENTS` first: trim whitespace, lowercase,
+and strip any leading slashes or `--` prefix before matching. The token `agents`
+(also accepted: `agent`, `--agents`, `-agents`) is a **first-class mode**, not a
+flag — match it BEFORE falling through to the "empty → ask mode" branch.
+
+| Normalized token         | Action                                                                 |
+|--------------------------|------------------------------------------------------------------------|
+| `agents` / `agent`       | Run Step 1 (light detection), then **jump to Step 4.5**. Skip 2/3/4/5/6. |
+| `new`                    | Skip detection, go to Step 2.                                          |
+| `existing`               | Step 1 detection → Step 2.                                             |
+| `auto`                   | Step 1A deep introspection → Step 1B (0 questions).                    |
+| `audit`                  | Step 1 detection → Step 5 (report, no writes).                         |
+| `quick` / `full`         | Set depth, then ask mode if not also given.                            |
+| *(empty)*                | Ask mode, then depth.                                                  |
+| anything else            | Treat as empty: ask mode. Do **not** tell the user the arg was rejected — `agents` is the only non-`--`-prefixed token a user is likely to type, and it's already handled above. |
+
+`agents` **takes precedence** over every other token. `/setup-wizard --full agents`,
+`/setup-wizard agents --quick`, and `/setup-wizard agents` all run the standalone
+agent-team phase (Step 4.5 only). The agent phase is re-runnable and idempotent,
+so users who want both the full wizard *and* an agent team run two invocations:
+`/setup-wizard --full` then `/setup-wizard agents`.
 
 **Mode** (if not set by argument):
 
