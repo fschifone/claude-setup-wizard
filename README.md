@@ -9,7 +9,7 @@
   <p align="center">
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License"></a>
     <a href="https://github.com/fschifone/claude-setup-wizard/actions"><img src="https://github.com/fschifone/claude-setup-wizard/actions/workflows/validate.yml/badge.svg" alt="CI"></a>
-    <img src="https://img.shields.io/badge/version-1.2.0-green.svg" alt="Version 1.2.0">
+    <img src="https://img.shields.io/badge/version-1.2.1-green.svg" alt="Version 1.2.1">
   </p>
 </p>
 
